@@ -51,10 +51,11 @@ def strip_hashtags(text):
     return re.sub(r'#(\w+)', '', text)
 
 def strip_special_chars(text):
-    # remove special characters but keep \' for contractions
-    text = re.sub(r'[^A-Za-z\'\s]+', ' ', text)
-    
+    # Mantieni .,!? e l'apostrofo
+    text = re.sub(r'[^A-Za-z0-9.,!?\'\s]+', ' ', text)  
     return text
+
+
 
 def strip_mentions(text):
     return re.sub(r'@(\w+)', '', text)
@@ -190,7 +191,7 @@ def strip_censorship(text):
     
 
 def filter_string(text):
-    
+     
     text = old_strip_emojis(text) 
     text = strip_emojis(text)
     
@@ -204,10 +205,7 @@ def filter_string(text):
     
     text = strip_special_chars(text)
     
-    
     text = trim_spaces(text)
-    
-    
     return text
    
    
