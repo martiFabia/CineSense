@@ -1,6 +1,8 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 from PIL import Image, ImageTk
+import shutil
+
 import os
 
 # Cartella dove sono memorizzati i file CSV
@@ -161,14 +163,43 @@ def process_reviews(csv_file, genre):
     # Dopo 2 secondi (dopo il messaggio di elaborazione) inizia a mostrare le immagini una alla volta
     root.after(2000, lambda: show_images_sequentially(genre))
 
-# Funzione per simulare il download del PDF
+REPORTS_FOLDER = "Report"  # Sostituisci con il percorso corretto della cartella dei report
+
 def download_pdf():
-    genre = genre_entry.get().strip()
-    if genre:
-        log_message("📥 Download del report PDF in corso...")
-        log_message(f"✅ Report PDF per '{genre}' scaricato con successo!")
-    else:
-        messagebox.showerror("Errore", "Nessun genere selezionato per il PDF!")
+    genre = genre_entry.get().strip()  # Prende il genere inserito dall'utente
+    if not genre:
+        messagebox.showerror("Error", "Please enter a movie genre before downloading the PDF.")
+        return
+
+    # Costruisce il nome del file basato sul genere
+    pdf_source = os.path.join(REPORTS_FOLDER, f"{genre}_Analysis.pdf")  
+
+    if not os.path.exists(pdf_source):
+        messagebox.showerror("Error", f"Report not found for genre '{genre}'. Make sure the analysis was completed.")
+        return
+
+    # Imposta la cartella di Download dell'utente come percorso predefinito
+    downloads_folder = os.path.expanduser("~/Downloads")
+    default_filename = f"Movie_Analysis_{genre}.pdf"
+
+    # Apre il dialogo per scegliere la cartella e il nome del file
+    pdf_path = filedialog.asksaveasfilename(
+        initialdir=downloads_folder,
+        title="Save PDF Report",
+        initialfile=default_filename,
+        defaultextension=".pdf",
+        filetypes=[("PDF files", "*.pdf")]
+    )
+
+    if pdf_path:
+        try:
+            shutil.copy(pdf_source, pdf_path)  # Copia il file PDF dalla cartella dei report
+            messagebox.showinfo("Success", f"PDF successfully saved to:\n{pdf_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save the PDF: {e}")
+
+
+
 
 # Funzione per cercare il CSV e processare il genere selezionato
 def find_csv_and_process():
