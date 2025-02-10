@@ -2,59 +2,57 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from PIL import Image, ImageTk
 import shutil
-
 import os
 
-# Cartella dove sono memorizzati i file CSV
+# Folder where CSV files are stored
 CSV_FOLDER = "Review/Final"
 
-# Creazione della finestra principale
+# Create main window
 root = tk.Tk()
-root.title("Movie Analysis - Report Generator")
+root.title("CineSense - Decoding Audience Insights, Shaping Better Films")
 root.geometry("900x800")
 root.resizable(False, False)
 
-# Stile moderno con ttk
+# Modern style with ttk
 style = ttk.Style(root)
 style.configure("TButton", font=("Helvetica", 14), padding=(10, 10), foreground="black")
 style.map("TButton", background=[("active", "#45a049")], foreground=[("!disabled", "black")])
 
-# Frame principale (contenitore globale)
+# Main frame (global container)
 frame = ttk.Frame(root, padding=20)
 frame.pack(expand=True, fill="both")
 
-# --- FRAME SUPERIORE: per input, bottoni, log e risultati ---
+# --- TOP FRAME: Input, buttons, log, and results ---
 top_frame = ttk.Frame(frame)
 top_frame.pack(side="top", fill="x", padx=10, pady=10)
 
-# Titolo
-title_label = ttk.Label(top_frame, text="🎬 Movie Analysis - Report Generator", font=("Helvetica", 20, "bold"))
+# Title
+title_label = ttk.Label(top_frame, text="🎬 CineSense - Decoding Audience Insights, Shaping Better Films", font=("Helvetica", 20, "bold"))
 title_label.pack(pady=10)
 
-# Campo di input per il genere
-genre_label = ttk.Label(top_frame, text="Inserisci il genere del film:", font=("Helvetica", 15))
+# Genre input field
+genre_label = ttk.Label(top_frame, text="Enter the movie genre you want to analyze:", font=("Helvetica", 15))
 genre_label.pack(pady=5)
 
 genre_entry = ttk.Entry(top_frame, width=50, font=("Helvetica", 16))
 genre_entry.pack(pady=5)
 
-# Frame per i bottoni (disposti orizzontalmente)
+# Button frame (horizontal layout)
 button_frame = ttk.Frame(top_frame)
 button_frame.pack(pady=10)
 
-# Bottone per cercare il CSV e avviare il processo
+# Button to search for CSV and start processing
 search_button = ttk.Button(button_frame, text="🔍 Find and Process", style="TButton", command=lambda: find_csv_and_process())
 search_button.pack(side="left", padx=5)
 
-# Bottone per scaricare il PDF (inizialmente non posizionato)
+# Button to download PDF (not displayed initially)
 download_button = ttk.Button(button_frame, text="📥 Download PDF Report", style="TButton", command=lambda: download_pdf())
-# Verrà mostrato dopo il completamento dell'elaborazione
 
-# Etichetta per mostrare il risultato
+# Label to display the result
 result_label = ttk.Label(top_frame, text="", font=("Helvetica", 12))
 result_label.pack(pady=5)
 
-# AREE DI LOG CON SCROLLBAR
+# LOG AREA WITH SCROLLBAR
 log_frame = tk.Frame(top_frame)
 log_frame.pack(expand=False, fill="both", pady=10)
 
@@ -66,20 +64,20 @@ log_text = tk.Text(log_frame, height=10, width=80, state="disabled", font=("Helv
 log_text.pack(expand=True, fill="both")
 log_scroll.config(command=log_text.yview)
 
-# --- FRAME INFERIORE: per le immagini scrollabili ---
+# --- BOTTOM FRAME: Scrollable images ---
 bottom_frame = ttk.Frame(frame)
 bottom_frame.pack(expand=True, fill="both", padx=10, pady=10)
 
-# Canvas per le immagini
+# Canvas for images
 image_canvas = tk.Canvas(bottom_frame, height=300)
 image_canvas.pack(side="top", fill="both", expand=True)
 
-# Scrollbar orizzontale per il canvas
+# Horizontal scrollbar for canvas
 image_scrollbar = tk.Scrollbar(bottom_frame, orient="horizontal", command=image_canvas.xview)
 image_scrollbar.pack(side="bottom", fill="x")
 image_canvas.configure(xscrollcommand=image_scrollbar.set)
 
-# Frame interno al canvas che ospiterà le immagini
+# Internal frame inside the canvas to hold images
 image_frame = tk.Frame(image_canvas, bg="black")
 image_window = image_canvas.create_window((0, 0), window=image_frame, anchor="nw")
 
@@ -88,27 +86,26 @@ def update_scroll_region(event=None):
 
 image_frame.bind("<Configure>", update_scroll_region)
 
-# Funzione per aggiornare il log
+# Function to update log messages
 def log_message(message):
     log_text.configure(state="normal")
     log_text.insert(tk.END, message + "\n")
     log_text.configure(state="disabled")
     log_text.see(tk.END)
 
-# Funzione per mostrare il bottone di download
+# Function to show the download button
 def show_download_button():
     if not download_button.winfo_ismapped():
         download_button.pack(side="left", padx=5)
     download_button.lift()
 
-# Funzione per completare l'elaborazione:
-# Verrà chiamata al termine della visualizzazione di tutte le immagini.
+# Function to complete the processing
 def finish_processing():
-    log_message("✅ Analisi completata. Puoi scaricare il report PDF.")
-    result_label.configure(text="✅ Analisi completata.")
+    log_message("✅ Analysis completed. You can download the PDF report.")
+    result_label.configure(text="✅ Analysis completed.")
     show_download_button()
 
-# Funzione che visualizza le immagini una alla volta, con un intervallo di 2 secondi
+# Function to display images one by one every 2 seconds
 def display_next_image(index, image_files):
     if index < len(image_files):
         img_path = image_files[index]
@@ -121,68 +118,66 @@ def display_next_image(index, image_files):
             img = img.resize((250, 250), resample_mode)
             img_photo = ImageTk.PhotoImage(img)
             label = tk.Label(image_frame, image=img_photo, bg="black")
-            label.image = img_photo  # Mantiene il riferimento per evitare la garbage collection
+            label.image = img_photo  # Keep reference to avoid garbage collection
             label.pack(side="left", padx=10, pady=10)
         except Exception as e:
-            log_message(f"Errore nel caricamento dell'immagine {img_path}: {e}")
+            log_message(f"Error loading image {img_path}: {e}")
         image_canvas.update_idletasks()
         image_canvas.configure(scrollregion=image_canvas.bbox("all"))
         image_canvas.xview_moveto(0)
-        # Pianifica la visualizzazione della prossima immagine dopo 2000 millisecondi (2 secondi)
+        # Schedule next image display after 2000ms (2 seconds)
         root.after(2000, lambda: display_next_image(index+1, image_files))
     else:
-        # Dopo aver visualizzato tutte le immagini, chiama finish_processing()
+        # After all images are displayed, call finish_processing()
         finish_processing()
 
-# Funzione per caricare le immagini e visualizzarle una alla volta
+# Function to load and display images sequentially
 def show_images_sequentially(genre):
     img_folder = os.path.join("Grafici", genre)
     if not os.path.exists(img_folder):
-        messagebox.showerror("Errore", f"❌ Nessuna cartella di immagini trovata per il genere '{genre}'.")
+        messagebox.showerror("Error", f"❌ No image folder found for genre '{genre}'.")
         return
 
     image_files = [os.path.join(img_folder, f)
                    for f in os.listdir(img_folder)
                    if f.lower().endswith((".png", ".jpg", ".jpeg"))]
     if not image_files:
-        messagebox.showerror("Errore", f"❌ Nessuna immagine trovata in '{img_folder}'.")
+        messagebox.showerror("Error", f"❌ No images found in '{img_folder}'.")
         return
 
-    # Rimuove eventuali immagini precedenti
+    # Remove any previous images
     for widget in image_frame.winfo_children():
         widget.destroy()
 
-    # Avvia la visualizzazione sequenziale delle immagini
+    # Start sequential image display
     display_next_image(0, image_files)
 
-# Funzione per "processare" il file CSV (simulazione)
+# Function to "process" the CSV file (simulation)
 def process_reviews(csv_file, genre):
-    log_message(f"✅ File trovato: {csv_file}")
-    # Dopo 1 secondo mostra il messaggio di elaborazione
-    root.after(1000, lambda: log_message(f"🔄 Elaborazione del file '{csv_file}' per il genere '{genre}'..."))
-    # Dopo 2 secondi (dopo il messaggio di elaborazione) inizia a mostrare le immagini una alla volta
+    log_message(f"✅ File found: {csv_file}")
+    root.after(1000, lambda: log_message(f"🔄 Processing file '{csv_file}' for genre '{genre}'..."))
     root.after(2000, lambda: show_images_sequentially(genre))
 
-REPORTS_FOLDER = "Report"  # Sostituisci con il percorso corretto della cartella dei report
+REPORTS_FOLDER = "Report"
 
 def download_pdf():
-    genre = genre_entry.get().strip()  # Prende il genere inserito dall'utente
+    genre = genre_entry.get().strip()  # Get user-entered genre
     if not genre:
         messagebox.showerror("Error", "Please enter a movie genre before downloading the PDF.")
         return
 
-    # Costruisce il nome del file basato sul genere
+    # Construct file name based on genre
     pdf_source = os.path.join(REPORTS_FOLDER, f"{genre}_Analysis.pdf")  
 
     if not os.path.exists(pdf_source):
         messagebox.showerror("Error", f"Report not found for genre '{genre}'. Make sure the analysis was completed.")
         return
 
-    # Imposta la cartella di Download dell'utente come percorso predefinito
+    # Set the user's Downloads folder as default save location
     downloads_folder = os.path.expanduser("~/Downloads")
     default_filename = f"Movie_Analysis_{genre}.pdf"
 
-    # Apre il dialogo per scegliere la cartella e il nome del file
+    # Open file dialog to choose save location
     pdf_path = filedialog.asksaveasfilename(
         initialdir=downloads_folder,
         title="Save PDF Report",
@@ -193,30 +188,27 @@ def download_pdf():
 
     if pdf_path:
         try:
-            shutil.copy(pdf_source, pdf_path)  # Copia il file PDF dalla cartella dei report
+            shutil.copy(pdf_source, pdf_path)  # Copy PDF file from reports folder
             messagebox.showinfo("Success", f"PDF successfully saved to:\n{pdf_path}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save the PDF: {e}")
 
-
-
-
-# Funzione per cercare il CSV e processare il genere selezionato
+# Function to find the CSV file and process the selected genre
 def find_csv_and_process():
     genre = genre_entry.get().strip().lower()
     if not genre:
-        messagebox.showerror("Errore", "Inserisci un genere di film!")
+        messagebox.showerror("Error", "Please enter a movie genre!")
         return
 
-    log_message(f"🔍 Ricerca del file 'reviews_{genre}.csv'...")
+    log_message(f"🔍 Searching for file 'reviews_{genre}.csv'...")
     csv_filename = f"reviews_{genre}.csv"
     csv_path = os.path.join(CSV_FOLDER, csv_filename)
 
     if os.path.exists(csv_path):
         process_reviews(csv_path, genre)
     else:
-        messagebox.showerror("Errore", f"❌ Il file '{csv_filename}' non è stato trovato in '{CSV_FOLDER}'.")
-        log_message(f"❌ File '{csv_filename}' non trovato.")
+        messagebox.showerror("Error", f"❌ File '{csv_filename}' not found in '{CSV_FOLDER}'.")
+        log_message(f"❌ File '{csv_filename}' not found.")
 
-# Avvio dell'interfaccia
+# Start the UI
 root.mainloop()
