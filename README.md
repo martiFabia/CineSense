@@ -7,4 +7,4 @@ CineSense analyzes audience reviews to extract valuable insights into the key fa
 that drive a film’s success, tailored to its specific genre.
 
 ## 📄 Complete Documentation
-For a detailed description of the project please refer to the [**Doc_CineSense**](./Doc_CineSense) file.
+For a detailed description of the project please refer to the [**Doc_CineSense**](./Doc_CineSense.pdf) file.
