@@ -1,4 +1,5 @@
-# FilmReviewsAnalysis-BusinessProject
+# CineSense
+*Decoding Audience Insights, Shaping Better Films*
 
 **CineSense** is an innovative application designed to support the film production and
 distribution process by leveraging the power of artificial intelligence. By integrating
