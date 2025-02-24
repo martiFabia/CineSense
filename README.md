@@ -8,3 +8,8 @@ that drive a film’s success, tailored to its specific genre.
 
 ## 📄 Complete Documentation
 For a detailed description of the project please refer to the [**Doc_CineSense**](./Doc_CineSense.pdf) file.
+
+## Authors
+- **Martina Fabiani**
+- **Tommaso Falaschi**
+- **Rossana Antonella Sacco**
